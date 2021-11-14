@@ -1,0 +1,1 @@
+uvicorn src.service.baseService.ResoursesService:app --reload
