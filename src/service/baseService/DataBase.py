@@ -2,7 +2,7 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy import create_engine
 
 
-DATABASE_URL = "postgresql://zlkhaimrgorqjg:bbc08f13a8e820b66b3cc0880a36a676ec82c2b56d947918b823effda0098a5d@ec2-35-169-43-5.compute-1.amazonaws.com:5432/de54sdj8s0j75h"
+DATABASE_URL = "postgresql://ysioenukhxqfvc:a82f291639e67fd9d3bd76a2db9ba975c465b856147721e0c1ff5cbed55f79ca@ec2-44-199-85-33.compute-1.amazonaws.com:5432/dale3qksnai120"
 engine = create_engine(DATABASE_URL)
 
 Base = declarative_base()

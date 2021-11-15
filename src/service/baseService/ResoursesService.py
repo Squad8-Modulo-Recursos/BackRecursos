@@ -1,15 +1,22 @@
 from typing import Optional
 
 from fastapi import FastAPI
+import uvicorn
+import sys
+import os
+from fastapi.middleware.cors import CORSMiddleware
+sys.path.append(os.path.join(os.path.dirname(__file__), ".."))
+from baseService.DataBase import Base, engine
+from calls import ApiCalls
 
 app = FastAPI()
 
 
-@app.get("/")
-def read_root():
-    return {"Hello": "World"}
 
 
-@app.get("/items/{item_id}")
-def read_item(item_id: int, q: Optional[str] = None):
-    return {"item_id": item_id, "q": q}
+app.include_router(ApiCalls.router, prefix="/users", tags=["Users"])
+
+if __name__ == '__main__':
+    Base.metadata.drop_all(engine)
+    Base.metadata.create_all(engine)
+    uvicorn.run(app, host='0.0.0.0', port=8000)
