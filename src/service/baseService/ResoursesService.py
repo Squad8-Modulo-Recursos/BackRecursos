@@ -12,9 +12,9 @@ from calls import ApiCalls
 app = FastAPI()
 
 
+ApiCalls.set_engine(engine)
 
-
-app.include_router(ApiCalls.router, prefix="/users", tags=["Users"])
+app.include_router(ApiCalls.router, prefix="/asdasd", tags=["Users"])
 
 if __name__ == '__main__':
     Base.metadata.drop_all(engine)
