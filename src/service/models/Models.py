@@ -16,23 +16,18 @@ class Proyecto(Base):
     proyecto_id = Column(String, primary_key=True, nullable=False)
     nombre_proyecto = Column(String, nullable=False)
     
-    
-    
-
 class Tarea(Base):
     __tablename__ = "Tareas"
     tarea_id = Column(String, primary_key=True, nullable=False)
     proyecto_id = Column(String, ForeignKey('Proyecto.proyecto_id'))
-   
 
 class Empleado(Base):
     __tablename__ = "Empleados"
     legajo = Column(String, primary_key=True, nullable=False)
     nombre_completo_empleado = Column(String, nullable=False)
-    
 
 class Carga_horas(Base):
-    __tablename__ = "Cargas"
+    __tablename__ = "cargas"
     carga_id = Column(String, primary_key=True)
     horas = Column(Integer, nullable= false)
     fecha = Column(DateTime )

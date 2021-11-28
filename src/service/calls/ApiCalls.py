@@ -1,6 +1,7 @@
-
+import requests
 from datetime import datetime
 from fastapi import status
+from sqlalchemy.sql.expression import null
 from sqlalchemy.sql.sqltypes import DateTime
 import uvicorn
 from fastapi import FastAPI
@@ -14,6 +15,7 @@ from sqlalchemy.orm.exc import NoResultFound
 
 
 router = APIRouter()
+router_empleados = APIRouter()
 session = None
 Session = None
 
@@ -27,47 +29,19 @@ def set_engine(engine_rcvd):
     session = Session()
 
 
-@router.get("/")
-def read_root():
-    return {"Hello": "World"}
-
-
-@router.get("/items/{item_id}")
-def read_item(item_id: int, q: Optional[str] = None):
-    return {"item_id": item_id, "q": q}
-
-
-#
-#{
- #   user_id:
- #   nombre:
- #   proyectos:
- #   tareas:
- #   descripcion:
-#}
-
-#{
-   # usuarios:{}
-   # proyectos:{ }
-   # tareas: {}
-#}
-
-
-@router.post('{proyecto_id}/{tarea_id}/cargarHoras/{legajo}', response_model=str, status_code=status.HTTP_200_OK)
-async def cargarHorasUsuarios(proyecto_id: str , tarea_id: str ,legajo: str ,  cantidad_horas: int,fecha: Optional[datetime] = None):
-    carga_id = str(uuid.uuid4())
-    nuevaCarga = Carga_horas(carga_id = carga_id,
+@router.post('/{proyecto_id}/{tarea_id}/cargarHoras/{legajo}', response_model=str, status_code=status.HTTP_200_OK)
+async def cargar_Horas_Usuarios(proyecto_id: str, tarea_id: str, legajo: str, cantidad_horas: int, fecha: Optional[datetime] = None):  
+    try:
+        carga_id = str(uuid.uuid4())
+        session.add(Carga_horas(carga_id = carga_id,
                               horas = cantidad_horas,
                               proyecto_id = proyecto_id,
                               tarea_id = tarea_id,
                               empleado_id = legajo,
-                              fecha =  fecha)
-    try:
-        session.add(nuevaCarga)
+                              fecha =  fecha))
         session.commit()
     except Exception as e:
-        return JSONResponse(status_code = status.HTTP_400_BAD_REQUEST, content = 'Error al cargar las horas ' + str(e))
-    
+        return JSONResponse(status_code = status.HTTP_400_BAD_REQUEST, content = 'Error al cargar las horas ' + str(e))  
     return JSONResponse(status_code = status.HTTP_200_OK,
                                 content= {"carga_id": carga_id,
                                 "horas": cantidad_horas,
@@ -75,19 +49,71 @@ async def cargarHorasUsuarios(proyecto_id: str , tarea_id: str ,legajo: str ,  c
                                 "tarea_id": tarea_id,
                                 'empleado_id': legajo})
 
-@router.get('/ObtenerHoras/{proyecto_id}', response_model=str, status_code=status.HTTP_200_OK)
-async def solicitarHorasPorProyecto(proyecto_id , fecha_menor: Optional[datetime] = None , fecha_mayor: Optional[datetime] = None):
-    try:
-        Carga_del_proyecto = session.query(Carga_horas).filter(Carga_horas.proyecto_id == proyecto_id)
-    except NoResultFound as err:
-        return JSONResponse(status_code = status.HTTP_404_NOT_FOUND, content= 'No se encotro el proyecto con id: ' + str(proyecto_id))
+@router.get('/ObtenerHorasProyecto/{proyecto_id}', response_model=str, status_code=status.HTTP_200_OK)
+async def solicitar_Horas_Por_Proyecto(proyecto_id, fecha_menor: Optional[datetime] = None, fecha_mayor: Optional[datetime] = None):
+    query = session.query(Carga_horas).filter(Carga_horas.proyecto_id == proyecto_id)
+    if(fecha_menor is not None):
+        query = query.filter(Carga_horas.fecha >= fecha_menor) 
+    if(fecha_mayor is not None):
+        query = query.filter(Carga_horas.fecha <= fecha_mayor) 
+    if query.count() == 0:
+        return JSONResponse(status_code = status.HTTP_404_NOT_FOUND, content= 'No se encontro el proyecto con id: ' + str(proyecto_id))
+
     horas_totales = 0
-    for carga in Carga_horas:
+    for carga in query:
         horas_totales += carga.horas
     return horas_totales
 
-##@router.get()
-##async def solicitarHorasPorTarea(tarea_id , fecha):
-##@router.get()
-##async def solicitarHorasPorEmpleado(Empleado_id , fecha):
+@router.get('/ObtenerHorasTarea/{tarea_id}', response_model=str, status_code=status.HTTP_200_OK)
+async def solicitar_Horas_Por_Tarea(tarea_id, fecha_menor: Optional[datetime] = None, fecha_mayor: Optional[datetime] = None):
+    query = session.query(Carga_horas).filter(Carga_horas.tarea_id == tarea_id)
+    if(fecha_menor is not None):
+        query = query.filter(Carga_horas.fecha >= fecha_menor) 
+    if(fecha_mayor is not None):
+        query = query.filter(Carga_horas.fecha <= fecha_mayor) 
+    if query.count() == 0:
+        return JSONResponse(status_code = status.HTTP_404_NOT_FOUND, content= 'No se encontro el proyecto con id: ' + str(tarea_id))
+
+    horas_totales = 0
+    for carga in query:
+        horas_totales += carga.horas
+    return horas_totales
+
+
+@router.get('/ObtenerHorasEmpleado/{empleado_id}', response_model=str, status_code=status.HTTP_200_OK)
+async def solicitar_Horas_Por_Empleado(empleado_id, fecha_menor: Optional[datetime] = None, fecha_mayor: Optional[datetime] = None):
+    query = session.query(Carga_horas).filter(Carga_horas.empleado_id == empleado_id)
+    if(fecha_menor is not None):
+        query = query.filter(Carga_horas.fecha >= fecha_menor) 
+    if(fecha_mayor is not None):
+        query = query.filter(Carga_horas.fecha <= fecha_mayor) 
+    if query.count() == 0:
+        return JSONResponse(status_code = status.HTTP_404_NOT_FOUND, content= 'No se encontro el proyecto con id: ' + str(empleado_id))
+
+    horas_totales = 0
+    for carga in query:
+        horas_totales += carga.horas
+    return horas_totales
+
+
+@router.get('/ObtenerTotalHoras', response_model=str, status_code=status.HTTP_200_OK)
+async def solicitar_Horas():
+    query = session.query(Carga_horas)
+    lista_horas = []
+    for hora in query:
+        lista_horas.append({
+            "carga_id": hora.carga_id,
+            "horas": hora.horas,
+            "fecha": hora.fecha,
+            "proyecto_id": hora.proyecto_id,
+            "tarea_id": hora.tarea_id,
+            "empleado_id" :hora.empleado_id,
+        })
+    return JSONResponse(status_code = status.HTTP_200_OK, content = lista_horas)
+
+
+@router_empleados.get('/ObtenerEmpleados')
+async def solicitar_empleados():
+    lista_empleados = requests.get("https://anypoint.mulesoft.com/mocking/api/v1/sources/exchange/assets/754f50e8-20d8-4223-bbdc-56d50131d0ae/recursos-psa/1.0.0/m/api/recursos")
+    return JSONResponse(status_code = lista_empleados.status_code, content = lista_empleados.json())
 

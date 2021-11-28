@@ -14,7 +14,8 @@ app = FastAPI()
 
 ApiCalls.set_engine(engine)
 
-app.include_router(ApiCalls.router, prefix="/asdasd", tags=["Users"])
+app.include_router(ApiCalls.router, prefix="/recursos", tags=["Recursos"])
+app.include_router(ApiCalls.router_empleados, prefix="/empleados", tags=["Empleados"])
 
 if __name__ == '__main__':
     Base.metadata.drop_all(engine)
