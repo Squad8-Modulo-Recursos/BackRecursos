@@ -19,7 +19,7 @@ class Proyecto(Base):
 class Tarea(Base):
     __tablename__ = "Tareas"
     tarea_id = Column(String, primary_key=True, nullable=False)
-    proyecto_id = Column(String, ForeignKey('Proyecto.proyecto_id'))
+    proyecto_id = Column(String, nullable=False)
 
 class Empleado(Base):
     __tablename__ = "Empleados"

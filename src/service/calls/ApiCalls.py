@@ -111,6 +111,17 @@ async def solicitar_Horas():
         })
     return JSONResponse(status_code = status.HTTP_200_OK, content = lista_horas)
 
+@router.delete('/EliminarHoras/{Carga_id}', response_model=str, status_code=status.HTTP_200_OK)
+async def eliminar_Horas(Carga_id):
+    query = session.query(Carga_horas).filter(Carga_horas.carga_id == Carga_id).delete()
+    return JSONResponse(status_code = status.HTTP_200_OK, content= "Borradito")
+
+
+@router.patch('ModificarHoras/{Carga_id}', response_model=str, status_code=status.HTTP_200_OK)
+async def modificar_Horas(Carga_id, cantidad_horas: int):
+    query = session.query(Carga_horas).filter(Carga_horas.carga_id == Carga_id)
+    query.horas = cantidad_horas
+    return JSONResponse(status_code = status.HTTP_200_OK, content= "Modificado de Horas")
 
 @router_empleados.get('/ObtenerEmpleados')
 async def solicitar_empleados():
