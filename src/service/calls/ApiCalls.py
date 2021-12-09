@@ -116,14 +116,14 @@ async def solicitar_Horas():
 @router.delete('/EliminarHoras/{Carga_id}', response_model=str, status_code=status.HTTP_200_OK)
 async def eliminar_Horas(Carga_id):
     query = session.query(Carga_horas).filter(Carga_horas.carga_id == Carga_id).delete()
-    return JSONResponse(status_code = status.HTTP_200_OK, content= "Borradito")
+    return JSONResponse(status_code = status.HTTP_200_OK, content= "Se ah eliminado la carga " + str(Carga_id))
 
 
-@router.patch('ModificarHoras/{Carga_id}', response_model=str, status_code=status.HTTP_200_OK)
+@router.patch('/ModificarHoras/{Carga_id}', response_model=str, status_code=status.HTTP_200_OK)
 async def modificar_Horas(Carga_id, cantidad_horas: int):
     query = session.query(Carga_horas).filter(Carga_horas.carga_id == Carga_id)
     query.horas = cantidad_horas
-    return JSONResponse(status_code = status.HTTP_200_OK, content= "Modificado de Horas")
+    return JSONResponse(status_code = status.HTTP_200_OK, content= "Se ah modificado la carga " + str(Carga_id)+ " correctamente.")
 
 @router_empleados.get('/ObtenerEmpleados')
 async def solicitar_empleados():
