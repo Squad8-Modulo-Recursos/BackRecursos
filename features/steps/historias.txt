@@ -1,0 +1,17 @@
+    Given un proyecto
+    When consulto las horas trabajadas sin especificar el periodo
+    Then se me mostraran las horas cargadas a todo el proyecto
+
+
+
+    
+
+
+    Scenario: obtener empleados disponibles 
+
+    Given que soy un modulo
+    When consulto sobre los empleados disponibles
+    Then se me mostraran los empleados disponibles
+
+    
+"""
