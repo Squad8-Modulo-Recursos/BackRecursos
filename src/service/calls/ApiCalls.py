@@ -31,6 +31,8 @@ def set_engine(engine_rcvd):
 
 @router.post('/{proyecto_id}/{tarea_id}/cargarHoras/{legajo}', response_model=str, status_code=status.HTTP_200_OK)
 async def cargar_Horas_Usuarios(proyecto_id: str, tarea_id: str, legajo: str, cantidad_horas: int, fecha: Optional[datetime] = None):  
+    if( cantidad_horas <= 0):
+        return JSONResponse(status_code = status.HTTP_400_BAD_REQUEST, content = 'La carga de horas no puede ser negativa')  
     try:
         carga_id = str(uuid.uuid4())
         session.add(Carga_horas(carga_id = carga_id,
