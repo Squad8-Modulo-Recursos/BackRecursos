@@ -69,7 +69,7 @@ def step_impl(contex):
 
 @then('se borrara la carga de hora en el sistema')
 def step_impl(contex):
-    assert contex.content == 'Se ah eliminado la carga ' + str(contex.carga_id)
+    assert contex.content == 'Se ha eliminado la carga ' + str(contex.carga_id)
     
 
 # Control de horas
@@ -119,5 +119,5 @@ def step_impl(contex):
 
 @then('se actualizara las horas en el sistema')
 def step_impl(contex):
-    assert contex.content == "Se ah modificado la carga " + str(contex.carga_id)+ " correctamente."
+    assert contex.content == "Se ha modificado la carga " + str(contex.carga_id)+ " correctamente."
 

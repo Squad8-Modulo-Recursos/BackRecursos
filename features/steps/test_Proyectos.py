@@ -1,3 +1,4 @@
+from starlette.status import HTTP_200_OK
 from behave import *
 import pytest
 import sys
@@ -6,11 +7,10 @@ import asyncio
 
 from requests.models import Response
 sys.path.append(os.path.join(os.path.dirname(__file__), "..","..","src" ,"service"))
-from fastapi import status
+from fastapi import params, status
 from calls import ApiCalls
 from baseService.DataBase import test_engine, Base
 from baseService.ResoursesService import app
-from datetime import datetime
 from fastapi.testclient import TestClient
 
 client= TestClient(app)
@@ -21,56 +21,47 @@ ApiCalls.set_engine(test_engine)
 
 @given('un proyecto')
 def step_impl(contex):
-    response = client.post('/recursos/project_id/tarea_id/cargarHoras/legajo?cantidad_horas=10&fecha=2022-12-02T21:33:33')
-    client.delete('/EliminarHoras/'+contex.carga_id)
+    contex.legajo = 'legajo'
+    contex.id_proyecto = 'proyecto_test'
+    response = client.post(f'/recursos/{contex.id_proyecto}/tarea_id/cargarHoras/{contex.legajo}?cantidad_horas=10&fecha=2021-12-02T21:33:33')
     assert response.status_code == status.HTTP_200_OK
-    contex.content = response.json()
-    contex.carga_id = contex.content['carga_id']
+    contex.carga_id = response.json()['carga_id']
  
-@when('consulto las horas trabajadas del proyecto sin especificar el periodo')
+@when('consulto las horas trabajadas sin especificar el periodo')
 def step_impl(contex):
-    response = client.get('/recursos/ObtenerHorasProyecto/project_id')
-    assert response.status_code == status.HTTP_200_OK
-    contex.content = response.json()
-    contex.horas = contex.content
+    response = client.get(f'/recursos/ObtenerHorasProyecto/{contex.legajo}/{contex.id_proyecto}')
+    contex.horas = response.json()
+    contex.status = response.status_code
 
 @then('se me mostraran las horas cargadas a todo el proyecto')
 def step_impl(contex):
-    assert contex.content == '10'
+    delete = client.delete(f'/recursos/EliminarHoras/{contex.carga_id}')
+    assert contex.status == status.HTTP_200_OK
+    assert contex.horas == '10'
 
 
-
-@given('un proyecto')
-def step_impl(contex):
-    response = client.post('/recursos/project_id/tarea_id/cargarHoras/legajo?cantidad_horas=10&fecha=2022-12-02T21:33:33')
-    response = client.post('/recursos/project_id/tarea_id/cargarHoras/legajo?cantidad_horas=10&fecha=2022-12-02T21:33:37')
-    client.delete('/EliminarHoras/'+contex.carga_id)
-    assert response.status_code == status.HTTP_200_OK
-    contex.content = response.json()
-    contex.carga_id = contex.content['carga_id']
  
 @when('consulto las horas trabajadas del proyecto en un periodo determinado')
 def step_impl(contex):
-    response = client.get('/recursos/ObtenerHorasProyecto/project_id?fecha_menor=2021-12-02T21:33:32&fecha_mayor=2022-11-02T21:33:34')
-    assert response.status_code == status.HTTP_200_OK
-    contex.content = response.json()
-    contex.horas = contex.content
+    response = client.get(f'/recursos/ObtenerHorasProyecto/{contex.legajo}/{contex.id_proyecto}', params={'fecha_menor':'2021-12-02T21:33:32', 'fecha_mayor':'2021-12-02T21:33:34'})
+    contex.horas = response.json()
+    contex.status = response.status_code
 
 @then('se me mostraran las horas cargadas al proyecto en ese periodo')
 def step_impl(contex):
-    assert contex.content == '10'
+    client.delete(f'/recursos/EliminarHoras/{contex.carga_id}')
+    assert contex.status == status.HTTP_200_OK 
+    assert contex.horas == '10'
 
 
 
 @given('un proyecto sin horas cargadas')
 def step_impl(contex):
+    contex.legajo = 'legajo'
+    contex.id_proyecto = 'proyecto_vacio'
+    contex.horas = '0'
     pass
 
-@when('consulto las horas trabajadas sin especificar el periodo')
-def step_impl(contex):
-    response = client.get('/recursos/ObtenerHorasProyecto/project_id')
-    contex.content = response.json()
-    contex.status = response.status_code
 
 @then('se notificará que no hay horas cargadas')
 def step_impl(contex):

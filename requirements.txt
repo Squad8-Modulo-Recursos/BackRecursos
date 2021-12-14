@@ -9,3 +9,4 @@ jinja2==2.11.2
 asyncio==3.4.3
 pytest==6.2.3
 requests==2.25.1
+behave==1.2.6
