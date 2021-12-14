@@ -1,17 +1,12 @@
 import requests
 from datetime import datetime
 from fastapi import status
-from sqlalchemy.sql.expression import null
-from sqlalchemy.sql.sqltypes import DateTime
-import uvicorn
-from fastapi import FastAPI
 from fastapi import APIRouter
 from typing import List, Optional
 from sqlalchemy.orm import sessionmaker
 from starlette.responses import JSONResponse
 import uuid
 from models.Models import Carga_horas
-from sqlalchemy.orm.exc import NoResultFound
 
 
 router = APIRouter()
@@ -51,9 +46,10 @@ async def cargar_Horas_Usuarios(proyecto_id: str, tarea_id: str, legajo: str, ca
                                 "tarea_id": tarea_id,
                                 'empleado_id': legajo})
 
-@router.get('/ObtenerHorasProyecto/{proyecto_id}', response_model=str, status_code=status.HTTP_200_OK)
-async def solicitar_Horas_Por_Proyecto(proyecto_id, fecha_menor: Optional[datetime] = None, fecha_mayor: Optional[datetime] = None):
-    query = session.query(Carga_horas).filter(Carga_horas.proyecto_id == proyecto_id)
+@router.get('/ObtenerHorasProyecto/{empleado_id}', response_model=str, status_code=status.HTTP_200_OK)
+async def solicitar_Horas_Por_Proyecto(empleado_id, proyecto_id, fecha_menor: Optional[datetime] = None, fecha_mayor: Optional[datetime] = None):
+    query = session.query(Carga_horas).filter(Carga_horas.empleado_id == empleado_id)
+    query = query.filter(Carga_horas.proyecto_id == proyecto_id)
     if(fecha_menor is not None):
         query = query.filter(Carga_horas.fecha >= fecha_menor) 
     if(fecha_mayor is not None):
@@ -66,15 +62,16 @@ async def solicitar_Horas_Por_Proyecto(proyecto_id, fecha_menor: Optional[dateti
         horas_totales += carga.horas
     return horas_totales
 
-@router.get('/ObtenerHorasTarea/{tarea_id}', response_model=str, status_code=status.HTTP_200_OK)
-async def solicitar_Horas_Por_Tarea(tarea_id, fecha_menor: Optional[datetime] = None, fecha_mayor: Optional[datetime] = None):
-    query = session.query(Carga_horas).filter(Carga_horas.tarea_id == tarea_id)
+@router.get('/ObtenerHorasTarea/{empleado_id}', response_model=str, status_code=status.HTTP_200_OK)
+async def solicitar_Horas_Por_Tarea(empleado_id, tarea_id, fecha_menor: Optional[datetime] = None, fecha_mayor: Optional[datetime] = None):
+    query = session.query(Carga_horas).filter(Carga_horas.empleado_id == empleado_id)
+    query = query.filter(Carga_horas.tarea_id == tarea_id)
     if(fecha_menor is not None):
         query = query.filter(Carga_horas.fecha >= fecha_menor) 
     if(fecha_mayor is not None):
         query = query.filter(Carga_horas.fecha <= fecha_mayor) 
     if query.count() == 0:
-        return JSONResponse(status_code = status.HTTP_404_NOT_FOUND, content= 'No se encontro el proyecto con id: ' + str(tarea_id))
+        return JSONResponse(status_code = status.HTTP_404_NOT_FOUND, content= 'No se encontro la tarea con id: ' + str(tarea_id))
 
     horas_totales = 0
     for carga in query:
@@ -90,7 +87,7 @@ async def solicitar_Horas_Por_Empleado(empleado_id, fecha_menor: Optional[dateti
     if(fecha_mayor is not None):
         query = query.filter(Carga_horas.fecha <= fecha_mayor) 
     if query.count() == 0:
-        return JSONResponse(status_code = status.HTTP_404_NOT_FOUND, content= 'No se encontro el proyecto con id: ' + str(empleado_id))
+        return JSONResponse(status_code = status.HTTP_404_NOT_FOUND, content= 'No se encontro el empleado con id: ' + str(empleado_id))
 
     horas_totales = 0
     for carga in query:
@@ -116,14 +113,14 @@ async def solicitar_Horas():
 @router.delete('/EliminarHoras/{Carga_id}', response_model=str, status_code=status.HTTP_200_OK)
 async def eliminar_Horas(Carga_id):
     query = session.query(Carga_horas).filter(Carga_horas.carga_id == Carga_id).delete()
-    return JSONResponse(status_code = status.HTTP_200_OK, content= "Se ah eliminado la carga " + str(Carga_id))
+    return JSONResponse(status_code = status.HTTP_200_OK, content= "Se ha eliminado la carga " + str(Carga_id))
 
 
 @router.patch('/ModificarHoras/{Carga_id}', response_model=str, status_code=status.HTTP_200_OK)
 async def modificar_Horas(Carga_id, cantidad_horas: int):
     query = session.query(Carga_horas).filter(Carga_horas.carga_id == Carga_id)
     query.horas = cantidad_horas
-    return JSONResponse(status_code = status.HTTP_200_OK, content= "Se ah modificado la carga " + str(Carga_id)+ " correctamente.")
+    return JSONResponse(status_code = status.HTTP_200_OK, content= "Se ha modificado la carga " + str(Carga_id)+ " correctamente.")
 
 @router_empleados.get('/ObtenerEmpleados')
 async def solicitar_empleados():
