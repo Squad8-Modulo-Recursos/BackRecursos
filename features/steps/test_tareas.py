@@ -20,6 +20,7 @@ ApiCalls.set_engine(test_engine)
 
 @given('una tarea "{letra}"')
 def step_impl(contex, letra):
+    contex.legajo = 'legajo'
     response = client.post('/recursos/proyect_id/tarea_id_' + letra +'/cargarHoras/legajo?cantidad_horas=10&fecha=2022-12-02T21:33:33')
     assert response.status_code == status.HTTP_200_OK
     contex.content = response.json()
@@ -27,7 +28,7 @@ def step_impl(contex, letra):
 
 @when('consulto las horas trabajadas de la tarea sin especificar el periodo')
 def step_impl(contex):
-    response = client.get('/recursos/ObtenerHorasTarea/tarea_id_A')
+    response = client.get(f'/recursos/ObtenerHorasTarea/{contex.legajo}/tarea_id_A')
     client.delete('/EliminarHoras/'+contex.carga_id)
     assert response.status_code == status.HTTP_200_OK
     contex.content = response.json()
@@ -41,7 +42,7 @@ def step_impl(contex):
 
 @when('consulto las horas trabajadas de la tarea en un periodo determinado')
 def step_impl(contex):
-    response = client.get('/recursos/ObtenerHorasTarea/tarea_id_B?fecha_menor=2021-12-02T21:33:33&fecha_mayor=2022-12-03T21:33:33')
+    response = client.get(f'/recursos/ObtenerHorasTarea/{contex.legajo}/tarea_id_B?fecha_menor=2021-12-02T21:33:33&fecha_mayor=2022-12-03T21:33:33')
     client.delete('/EliminarHoras/'+contex.carga_id)
     assert response.status_code == status.HTTP_200_OK
     contex.horas = response.json()
@@ -53,11 +54,12 @@ def step_impl(contex):
 
 @given('una tarea sin horas cargadas')
 def step_impl(contex):
+    contex.legajo = 'legajo'
     pass
 
 @when('consulto las horas trabajadas')
 def step_impl(contex):
-    response = client.get('/recursos/ObtenerHorasTarea/tarea_id_C')
+    response = client.get(f'/recursos/ObtenerHorasTarea/{contex.legajo}/tarea_id_C')
     assert response.status_code == status.HTTP_404_NOT_FOUND
     contex.content = response.json()
     
@@ -65,4 +67,4 @@ def step_impl(contex):
 
 @then('se notificara que no hay horas cargadas a la tarea')
 def step_impl(contex):
-    assert contex.content == 'No se encontro el proyecto con id: tarea_id_C'
+    assert contex.content == 'No se encontraron horas.'
