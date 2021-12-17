@@ -21,7 +21,7 @@ ApiCalls.set_engine(test_engine)
 @given('una tarea "{letra}"')
 def step_impl(contex, letra):
     contex.legajo = 'legajo'
-    response = client.post('/recursos/proyect_id/tarea_id_' + letra +'/cargarHoras/legajo?cantidad_horas=10&fecha=2022-12-02T21:33:33')
+    response = client.post('/recursos/proyect_id/tarea_id_' + letra +'/cargarHoras/legajo?cantidad_horas=10&fecha=2022-12-02')
     assert response.status_code == status.HTTP_200_OK
     contex.content = response.json()
     contex.carga_id = contex.content['carga_id']
@@ -42,7 +42,7 @@ def step_impl(contex):
 
 @when('consulto las horas trabajadas de la tarea en un periodo determinado')
 def step_impl(contex):
-    response = client.get(f'/recursos/ObtenerHorasTarea/{contex.legajo}/tarea_id_B?fecha_menor=2021-12-02T21:33:33&fecha_mayor=2022-12-03T21:33:33')
+    response = client.get(f'/recursos/ObtenerHorasTarea/{contex.legajo}/tarea_id_B?fecha_menor=2021-12-02&fecha_mayor=2022-12-03')
     client.delete('/EliminarHoras/'+contex.carga_id)
     assert response.status_code == status.HTTP_200_OK
     contex.horas = response.json()

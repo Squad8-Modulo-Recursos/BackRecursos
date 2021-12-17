@@ -20,7 +20,7 @@ ApiCalls.set_engine(test_engine)
 
 
 def test_crear_carga():
-    response = client.post('/recursos/proyect_id/tarea_id/cargarHoras/legajo?cantidad_horas=10&fecha=2022-12-02T21:33:33')
+    response = client.post('/recursos/proyect_id/tarea_id/cargarHoras/legajo?cantidad_horas=10&fecha=2022-12-02')
     assert response.status_code == status.HTTP_200_OK
     content = response.json()
     carga_id = content['carga_id']

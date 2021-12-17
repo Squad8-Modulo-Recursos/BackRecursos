@@ -23,7 +23,7 @@ ApiCalls.set_engine(test_engine)
 def step_impl(contex):
     contex.legajo = 'legajo'
     contex.id_proyecto = 'proyecto_test'
-    response = client.post(f'/recursos/{contex.id_proyecto}/tarea_id/cargarHoras/{contex.legajo}?cantidad_horas=10&fecha=2021-12-02T21:33:33')
+    response = client.post(f'/recursos/{contex.id_proyecto}/tarea_id/cargarHoras/{contex.legajo}?cantidad_horas=10&fecha=2021-12-02')
     assert response.status_code == status.HTTP_200_OK
     contex.carga_id = response.json()['carga_id']
  
@@ -43,7 +43,7 @@ def step_impl(contex):
  
 @when('consulto las horas trabajadas del proyecto en un periodo determinado')
 def step_impl(contex):
-    response = client.get(f'/recursos/ObtenerHorasProyecto/{contex.legajo}/{contex.id_proyecto}', params={'fecha_menor':'2021-12-02T21:33:32', 'fecha_mayor':'2021-12-02T21:33:34'})
+    response = client.get(f'/recursos/ObtenerHorasProyecto/{contex.legajo}/{contex.id_proyecto}', params={'fecha_menor':'2021-12-02', 'fecha_mayor':'2021-12-03'})
     contex.horas = response.json()
     contex.status = response.status_code
 

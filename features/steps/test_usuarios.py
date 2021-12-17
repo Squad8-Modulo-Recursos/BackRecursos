@@ -25,7 +25,7 @@ def step_impl(contex):
 
 @when('carga sus horas trabajadas en una tarea en una fecha determinada')
 def step_impl(contex):
-    response = client.post('/recursos/proyect_id/tarea_id/cargarHoras/legajo?cantidad_horas=10&fecha=2022-12-02T21:33:33')
+    response = client.post('/recursos/proyect_id/tarea_id/cargarHoras/legajo?cantidad_horas=10&fecha=2022-12-02')
     assert response.status_code == status.HTTP_200_OK
     contex.content = response.json()
     contex.carga_id = contex.content['carga_id']
@@ -41,7 +41,7 @@ def step_impl(contex):
 
 @when('carga un numero negativo de horas trabajas a una tarea en una fecha determinado')
 def step_impl(contex):
-    response = client.post('/recursos/proyect_id/tarea_id/cargarHoras/legajo?cantidad_horas=-10&fecha=2022-12-02T21:33:33')
+    response = client.post('/recursos/proyect_id/tarea_id/cargarHoras/legajo?cantidad_horas=-10&fecha=2022-12-02')
     assert response.status_code == status.HTTP_400_BAD_REQUEST
     contex.content = response.json()
     
@@ -54,7 +54,7 @@ def step_impl(contex):
 #Borrado de horas
 @given('un empleado "{letra}"')
 def step_impl(contex, letra):
-    response = client.post('/recursos/proyect_id/tarea_id/cargarHoras/legajo_'+ letra +'?cantidad_horas=10&fecha=2022-12-02T21:33:33')
+    response = client.post('/recursos/proyect_id/tarea_id/cargarHoras/legajo_'+ letra +'?cantidad_horas=10&fecha=2022-12-02')
     assert response.status_code == status.HTTP_200_OK
     contex.content = response.json()
     contex.carga_id = contex.content['carga_id']
@@ -78,7 +78,7 @@ def step_impl(contex):
 
 @when('consulto sus horas trabajadas en un periodo determinado')
 def step_impl(contex):  
-    response = client.get('/recursos/ObtenerHorasEmpleado/legajo_A?fecha_menor=2021-12-02T21:33:33&fecha_mayor=2022-12-03T21:33:33')
+    response = client.get('/recursos/ObtenerHorasEmpleado/legajo_A?fecha_menor=2021-12-02&fecha_mayor=2022-12-03')
     client.delete('/recursos/EliminarHoras/'+contex.carga_id)
     assert response.status_code == status.HTTP_200_OK
     contex.content = response.json()
@@ -104,7 +104,7 @@ def step_impl(contex):
 
 @given('que ingrese una cantidad incorrecta de horas a una tarea')
 def step_impl(contex):
-    response = client.post('/recursos/proyect_id/tarea_id/cargarHoras/legajo_D?cantidad_horas=10&fecha=2022-12-02T21:33:33')
+    response = client.post('/recursos/proyect_id/tarea_id/cargarHoras/legajo_D?cantidad_horas=10&fecha=2022-12-02')
     assert response.status_code == status.HTTP_200_OK
     contex.content = response.json()
     contex.carga_id = contex.content['carga_id']
