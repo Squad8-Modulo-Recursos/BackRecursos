@@ -1,5 +1,5 @@
 import requests
-from datetime import datetime
+from datetime import date
 from fastapi import status
 from fastapi import APIRouter
 from typing import List, Optional
@@ -25,7 +25,7 @@ def set_engine(engine_rcvd):
 
 
 @router.post('/{proyecto_id}/{tarea_id}/cargarHoras/{legajo}', response_model=str, status_code=status.HTTP_200_OK)
-async def cargar_Horas_Usuarios(proyecto_id: str, tarea_id: str, legajo: str, cantidad_horas: int, fecha: Optional[datetime] = None):  
+async def cargar_Horas_Usuarios(proyecto_id: str, tarea_id: str, legajo: str, cantidad_horas: int, fecha: Optional[date] = None):  
     if( cantidad_horas <= 0):
         return JSONResponse(status_code = status.HTTP_400_BAD_REQUEST, content = 'La carga de horas no puede ser negativa')  
     try:
@@ -47,7 +47,7 @@ async def cargar_Horas_Usuarios(proyecto_id: str, tarea_id: str, legajo: str, ca
                                 'empleado_id': legajo})
 
 @router.get('/ObtenerHorasProyecto/{legajo}/{proyecto_id}', response_model=str, status_code=status.HTTP_200_OK)
-async def solicitar_Horas_Por_Proyecto(legajo, proyecto_id, fecha_menor: Optional[datetime] = None, fecha_mayor: Optional[datetime] = None):
+async def solicitar_Horas_Por_Proyecto(legajo, proyecto_id, fecha_menor: Optional[date] = None, fecha_mayor: Optional[date] = None):
     query = session.query(Carga_horas).filter((Carga_horas.proyecto_id == proyecto_id) & (Carga_horas.empleado_id == legajo))
     if(fecha_menor is not None):
         query = query.filter(Carga_horas.fecha >= fecha_menor) 
@@ -62,7 +62,7 @@ async def solicitar_Horas_Por_Proyecto(legajo, proyecto_id, fecha_menor: Optiona
     return horas_totales
 
 @router.get('/ObtenerHorasTarea/{legajo}/{tarea_id}', response_model=str, status_code=status.HTTP_200_OK)
-async def solicitar_Horas_Por_Tarea(legajo, tarea_id, fecha_menor: Optional[datetime] = None, fecha_mayor: Optional[datetime] = None):
+async def solicitar_Horas_Por_Tarea(legajo, tarea_id, fecha_menor: Optional[date] = None, fecha_mayor: Optional[date] = None):
     query = session.query(Carga_horas).filter((Carga_horas.empleado_id == legajo) & (Carga_horas.tarea_id == tarea_id))
     if(fecha_menor is not None):
         query = query.filter(Carga_horas.fecha >= fecha_menor) 
@@ -78,7 +78,7 @@ async def solicitar_Horas_Por_Tarea(legajo, tarea_id, fecha_menor: Optional[date
 
 
 @router.get('/ObtenerHorasEmpleado/{empleado_id}', response_model=str, status_code=status.HTTP_200_OK)
-async def solicitar_Horas_Por_Empleado(empleado_id, fecha_menor: Optional[datetime] = None, fecha_mayor: Optional[datetime] = None):
+async def solicitar_Horas_Por_Empleado(empleado_id, fecha_menor: Optional[date] = None, fecha_mayor: Optional[date] = None):
     query = session.query(Carga_horas).filter(Carga_horas.empleado_id == empleado_id)
     if(fecha_menor is not None):
         query = query.filter(Carga_horas.fecha >= fecha_menor) 
