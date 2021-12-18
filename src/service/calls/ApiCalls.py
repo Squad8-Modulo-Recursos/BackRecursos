@@ -6,6 +6,8 @@ from typing import List, Optional
 from sqlalchemy.orm import sessionmaker
 from starlette.responses import JSONResponse
 import uuid
+
+from starlette.status import HTTP_404_NOT_FOUND
 from models.Models import Carga_horas
 
 
@@ -124,7 +126,12 @@ async def modificar_Horas(carga_id, cantidad_horas: int):
     return JSONResponse(status_code = status.HTTP_200_OK, content= "Se ha modificado la carga " + str(carga_id)+ " correctamente.")
 
 @router_empleados.get('/ObtenerEmpleados')
-async def solicitar_empleados():
+async def solicitar_empleados(legajo: Optional[int] = None):
     lista_empleados = requests.get("https://anypoint.mulesoft.com/mocking/api/v1/sources/exchange/assets/754f50e8-20d8-4223-bbdc-56d50131d0ae/recursos-psa/1.0.0/m/api/recursos")
+    if legajo is not None:
+        for empleado in lista_empleados.json():
+            if empleado['legajo'] == legajo:
+                return JSONResponse(status_code = lista_empleados.status_code, content = empleado)
+        return JSONResponse(status_code = HTTP_404_NOT_FOUND, content = 'No se encontro el empleado con legajo ' + str(legajo))
     return JSONResponse(status_code = lista_empleados.status_code, content = lista_empleados.json())
 
