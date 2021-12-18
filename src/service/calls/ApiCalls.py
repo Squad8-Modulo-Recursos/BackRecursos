@@ -94,6 +94,27 @@ async def solicitar_Horas_Por_Empleado(empleado_id, fecha_menor: Optional[date] 
         horas_totales += carga.horas
     return horas_totales
 
+@router.get('/ObtenerCargas/{empleado_id}',  status_code=status.HTTP_200_OK)
+async def solicitar_Cargas_Empleado(empleado_id, fecha_menor: Optional[date] = None, fecha_mayor: Optional[date] = None):
+    query = session.query(Carga_horas).filter(Carga_horas.empleado_id == empleado_id)
+    if(fecha_menor is not None):
+        query = query.filter(Carga_horas.fecha >= fecha_menor) 
+    if(fecha_mayor is not None):
+        query = query.filter(Carga_horas.fecha <= fecha_mayor) 
+    if query.count() == 0:
+        return JSONResponse(status_code = status.HTTP_404_NOT_FOUND, content= 'No se encontraron horas.')
+
+    lista_horas = []
+    for hora in query:
+        lista_horas.append({
+            "carga_id": hora.carga_id,
+            "horas": hora.horas,
+            "fecha": hora.fecha,
+            "proyecto_id": hora.proyecto_id,
+            "tarea_id": hora.tarea_id,
+            "empleado_id" :hora.empleado_id,
+        })
+    return lista_horas
 
 @router.get('/ObtenerTotalHoras', status_code=status.HTTP_200_OK)
 async def solicitar_Horas():
