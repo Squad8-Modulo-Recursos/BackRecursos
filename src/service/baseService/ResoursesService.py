@@ -9,10 +9,18 @@ sys.path.append(os.path.join(os.path.dirname(__file__), ".."))
 from baseService.DataBase import Base, engine
 from calls import ApiCalls
 
+origins = ["*"]
 app = FastAPI()
 
-
 ApiCalls.set_engine(engine)
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 app.include_router(ApiCalls.router, prefix="/recursos", tags=["Recursos"])
 app.include_router(ApiCalls.router_empleados, prefix="/empleados", tags=["Empleados"])
