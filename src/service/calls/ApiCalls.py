@@ -140,6 +140,19 @@ async def eliminar_Horas(carga_id):
     session.commit()
     return JSONResponse(status_code = status.HTTP_200_OK, content= "Se ha eliminado la carga " + str(carga_id))
 
+@router.delete('/EliminarHorasPorProyecto/{proyecto_id}', response_model=str, status_code=status.HTTP_200_OK)
+async def eliminar_HorasPorProyecto(proyecto_id):
+    session.query(Carga_horas).filter(Carga_horas.proyecto_id == proyecto_id).delete()
+    session.commit()
+    return JSONResponse(status_code = status.HTTP_200_OK, content= "Se ha eliminado las cargas del proyecto " + str(proyecto_id))
+
+
+@router.delete('/EliminarHorasPorTarea/{tarea_id}', response_model=str, status_code=status.HTTP_200_OK)
+async def eliminar_HorasPorTarea( tarea_id , proyecto_id):
+    session.query(Carga_horas).filter(Carga_horas.proyecto_id == proyecto_id).filter(Carga_horas.tarea_id == tarea_id).delete()
+    session.commit()
+    return JSONResponse(status_code = status.HTTP_200_OK, content= "Se ha eliminado las cargas de la tarea " + str(tarea_id))
+
 
 @router.patch('/ModificarHoras/{carga_id}', response_model=str, status_code=status.HTTP_200_OK)
 async def modificar_Horas(carga_id, cantidad_horas: int):
