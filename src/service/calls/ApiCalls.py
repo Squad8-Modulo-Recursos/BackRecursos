@@ -144,6 +144,8 @@ async def eliminar_Horas(carga_id):
 @router.patch('/ModificarHoras/{carga_id}', response_model=str, status_code=status.HTTP_200_OK)
 async def modificar_Horas(carga_id, cantidad_horas: int):
     carga = session.get(Carga_horas, carga_id)
+    if carga is None:
+        return JSONResponse(status_code = status.HTTP_404_NOT_FOUND, content= "No se encontró la carga " + str(carga_id)+ ".")
     carga.horas = cantidad_horas
     session.commit()
     return JSONResponse(status_code = status.HTTP_200_OK, content= "Se ha modificado la carga " + str(carga_id)+ " correctamente.")
