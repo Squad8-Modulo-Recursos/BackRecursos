@@ -2,7 +2,7 @@ import datetime
 from typing import Optional
 from pydantic import EmailStr
 from pydantic.main import BaseModel
-from sqlalchemy import Boolean, Column, ForeignKey, Integer, String, DateTime, Float
+from sqlalchemy import Boolean, Column, ForeignKey, Integer, String, Date, Float
 import sys
 import os
 
@@ -30,7 +30,7 @@ class Carga_horas(Base):
     __tablename__ = "cargas"
     carga_id = Column(String, primary_key=True)
     horas = Column(Integer, nullable= false)
-    fecha = Column(DateTime )
+    fecha = Column(Date)
     proyecto_id = Column(String, nullable=False)
     tarea_id = Column(String,nullable=False)
     empleado_id = Column(String,nullable=False)
